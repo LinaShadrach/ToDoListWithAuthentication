@@ -1,6 +1,8 @@
-﻿namespace ToDoList.Models
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+namespace ToDoList.Models
 {
-    public class Item
+    public class AppUser : IdentityUser
     {
     }
 }

@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ToDoList.Controllers
 {
-    public class HomeController : Controller
+    public class AccountController : Controller
     {
         // GET: /<controller>/
         public IActionResult Index()

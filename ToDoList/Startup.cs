@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using ToDoList.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ToDoList
 {
@@ -24,19 +26,23 @@ namespace ToDoList
         {
             services.AddMvc();
             services.AddEntityFrameworkMySql()
-                    .AddDbContext<ToDoListContext>(options =>
+                    .AddDbContext<ToDoListDbContext>(options =>
                                               options
                                                    .UseMySql(Configuration["ConnectionStrings:DefaultConnection"]));
+            services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<ToDoListDbContext>()
+                .AddDefaultTokenProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseIdentity();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Account}/{action=Index}/{id?}");
             });
 
             loggerFactory.AddConsole();
