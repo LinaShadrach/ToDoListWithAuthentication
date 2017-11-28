@@ -1,13 +1,30 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@using System.Security.Claims
+
+<h2>LOG IN OR REGISTER</h2>
+<hr />
+@if (User.Identity.IsAuthenticated)
+{
+    <p>Hello @User.Identity.Name!</p>
+
+    using (Html.BeginForm("LogOff", "Account"))
+    {
+        
+        <input type="submit" class="btn btn-default" value="Log out" />
+    }
 }
-<html>
-<head>
-    <title>To Do List</title>
-</head>
-<body>
-    <h2>Welcome to the To Do List!</h2>
-</body>
-</html>
+else
+{
+    using (Html.BeginForm("Register", "Account"))
+    {
+        
+
+        <button type="submit" class="register btn">REGISTER</button>
+    }
+        using (Html.BeginForm("LogOn", "Account"))
+    {
+        
+
+        <button type="submit" class="login btn">LOG IN</button>
+    }
+
+}
