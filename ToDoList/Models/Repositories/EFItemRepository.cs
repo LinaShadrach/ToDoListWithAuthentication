@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToDoList.Models.Repositories
 {
     public class EFItemRepository : IItemRepository
     {
         ToDoListDbContext db = new ToDoListDbContext();
-
         public IQueryable<Item> Items
         { get { return db.Items; } }
 
