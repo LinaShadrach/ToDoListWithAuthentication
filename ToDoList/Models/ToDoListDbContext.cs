@@ -8,7 +8,7 @@ namespace ToDoList.Models
 {
     public class ToDoListDbContext : IdentityDbContext<AppUser>
     {
-        //public DbSet<Item> Items { get; set; }
+        public virtual DbSet<Item> Items { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder
@@ -17,10 +17,14 @@ namespace ToDoList.Models
         {
         }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    base.OnModelCreating(modelBuilder);
-        //}
+        public ToDoListDbContext()
+        {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }
 
