@@ -15,10 +15,12 @@ namespace ToDoList.Controllers
     {
 
         private IAppUserRepository appUserRepo;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
         public AccountController(IAppUserRepository thisRepo = null)
         {
             if(thisRepo==null){
-                this.appUserRepo = new EFAppUserRepository();
+                this.appUserRepo = new EFAppUserRepository(_userManager, _signInManager);
             }
             else{
                 this.appUserRepo = thisRepo;
@@ -39,16 +41,17 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            Task<AppUser> user = appUserRepo.Register(model);
+            AppUser user = await appUserRepo.Register(model);
+            System.Console.WriteLine("***************************************************************************hello");
             if (user!=null)
             {
                 return View("Index", "Items");
             }
             else
             {
-                return View("Index", "Account");
+                return View("Index");
             }
         }
 

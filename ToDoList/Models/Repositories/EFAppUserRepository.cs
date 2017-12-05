@@ -11,10 +11,18 @@ namespace ToDoList.Models.Repositories
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public EFAppUserRepository(UserManager<AppUser> userManager = null, SignInManager<AppUser> signInManager= null)
+        public EFAppUserRepository(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            if (userManager == null)
+            {
+                _userManager = userManager;
+                _signInManager = signInManager;
+            }
+        }
+
+        public EFAppUserRepository()
+      : this(new UserManager<AppUser>(new UserStore<AppUser>(new ToDoListDbContext())))
+    {
         }
 
 
@@ -34,14 +42,7 @@ namespace ToDoList.Models.Repositories
         {
             AppUser foundUser = new AppUser { UserName = user.Email };
             IdentityResult result = await _userManager.CreateAsync(foundUser, user.Password);
-            if (result.Succeeded)
-            {
-                return foundUser;
-            }
-            else
-            {
-                return null;
-            }
+            return foundUser;
         }
     }
 }
