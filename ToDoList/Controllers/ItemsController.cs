@@ -14,20 +14,22 @@ namespace ToDoList.Controllers
     {
         private IItemRepository itemRepo;
 
-        public ItemsController()
+        public ItemsController(IItemRepository thisRepo = null)
         {
-            this.itemRepo = new EFItemRepository();
-
-        }
-        public ItemsController(IItemRepository thisRepo)
-        {
-            this.itemRepo = thisRepo;
+            if (thisRepo == null)
+            {
+                this.itemRepo = new EFItemRepository();
+            }
+            else
+            {
+                this.itemRepo = thisRepo;
+            }
         }
 
 
         public ViewResult Index()
         {
-            return View(itemRepo.Items.ToList());
+            return View();
         }
 
         public IActionResult Details(int id)
@@ -73,5 +75,5 @@ namespace ToDoList.Controllers
             return RedirectToAction("Index");
         }
     }
-    }
+
 }

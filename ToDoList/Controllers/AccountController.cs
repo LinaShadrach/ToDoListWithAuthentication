@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Models;
+using ToDoList.Models.Repositories;
 using ToDoList.ViewModels;
 
 
@@ -12,23 +13,20 @@ namespace ToDoList.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly ToDoListDbContext _db;
-        private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ToDoListDbContext db)
+        private IAppUserRepository appUserRepo;
+        public AccountController(IAppUserRepository thisRepo = null)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
-            _db = db;
+            if(thisRepo==null){
+                this.appUserRepo = new EFAppUserRepository();
+            }
+            else{
+                this.appUserRepo = thisRepo;
+            }
+
         }
 
         //public AccountController() { }
-
-        public UserManager<AppUser> GetUser()
-        {
-            return _userManager;
-        }
 
         public IActionResult Index()
         {
@@ -41,14 +39,12 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RegisterUser(RegisterViewModel model)
+        public IActionResult Register(RegisterViewModel model)
         {
-            AppUser user = new AppUser { UserName = model.Email, Email = model.Email };
-            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
+            Task<AppUser> user = appUserRepo.Register(model);
+            if (user!=null)
             {
-                await _userManager.AddToRoleAsync(user, "user");
-                return await LoginOnRegister(user, model.Password);
+                return View("Index", "Items");
             }
             else
             {
@@ -57,47 +53,47 @@ namespace ToDoList.Controllers
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> LoginOnRegister(AppUser user, string password)
-        {
+        //[HttpPost]
+        //public async Task<IActionResult> LoginOnRegister(AppUser user, string password)
+        //{
 
-            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(user.Email, password, isPersistent: true, lockoutOnFailure: false);
-            if (result.Succeeded)
-            {
+        //    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(user.Email, password, isPersistent: true, lockoutOnFailure: false);
+        //    if (result.Succeeded)
+        //    {
 
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return RedirectToAction("Register");
-            }
-        }
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction("Register");
+        //    }
+        //}
 
-        public IActionResult Login()
-        {
-            return View();
-        }
+        //public IActionResult Login()
+        //{
+        //    return View();
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
-        {
-            Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: true, lockoutOnFailure: false);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                return View();
-            }
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> Login(LoginViewModel model)
+        //{
+        //    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: true, lockoutOnFailure: false);
+        //    if (result.Succeeded)
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    else
+        //    {
+        //        return View();
+        //    }
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> LogOff()
-        {
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index");
-        }
+        //[HttpPost]
+        //public async Task<IActionResult> LogOff()
+        //{
+        //    await _signInManager.SignOutAsync();
+        //    return RedirectToAction("Index");
+        //}
 
         public IActionResult HelloAjax()
         {
