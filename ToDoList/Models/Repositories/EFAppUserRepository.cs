@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using ToDoList.ViewModels;
 
 namespace ToDoList.Models.Repositories
@@ -13,18 +14,12 @@ namespace ToDoList.Models.Repositories
 
         public EFAppUserRepository(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            if (userManager == null)
+            if (userManager != null)
             {
                 _userManager = userManager;
                 _signInManager = signInManager;
             }
         }
-
-        public EFAppUserRepository()
-      : this(new UserManager<AppUser>(new UserStore<AppUser>(new ToDoListDbContext())))
-    {
-        }
-
 
         //public IQueryable<AppUser> AppUsers
         //{ get { return _db.AppUsers; } }
@@ -42,7 +37,14 @@ namespace ToDoList.Models.Repositories
         {
             AppUser foundUser = new AppUser { UserName = user.Email };
             IdentityResult result = await _userManager.CreateAsync(foundUser, user.Password);
-            return foundUser;
+            if(result.Succeeded)
+            {
+                return foundUser;                
+            }
+            else{
+                return null;
+            }
+
         }
     }
 }
