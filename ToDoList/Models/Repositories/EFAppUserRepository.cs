@@ -1,36 +1,51 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using ToDoList.Models;
+using ToDoList.ViewModels;
 
 namespace ToDoList.Models.Repositories
 {
     public class EFAppUserRepository : IAppUserRepository
     {
         ToDoListDbContext db = new ToDoListDbContext();
-        public EFAppUserRepository(UserManager userManager, SignInManager signInManager, ToDoListDbContext db){
-          
-        }
-        public IQueryable<AppUser> AppUsers
-        { get { return db.AppUsers; } }
+        private UserManager<AppUser> _userManager;
+        private SignInManager<AppUser> _signInManager;
+        private UserManager<AppUser> userManager;
+        private SignInManager<AppUser> signInManager;
 
-        public AppUser Save(AppUser item)
+        public EFAppUserRepository(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            db.AppUsers.Add(item);
-            db.SaveChanges();
-            return item;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        public AppUser Edit(AppUser item)
+        public async Task<bool> Register(RegisterViewModel model)
         {
-            db.Entry(item).State = EntityState.Modified;
-            db.SaveChanges();
-            return item;
+
+            AppUser user = new AppUser { UserName = model.Email, Email = model.Email };
+            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+            if (result.Succeeded)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
-        public void Remove(AppUser item)
+        public Task<bool> Login(LoginViewModel model)
         {
-            db.AppUsers.Remove(item);
-            db.SaveChanges();
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> Logoff(AppUser user)
+        {
+            throw new NotImplementedException();
         }
     }
 }

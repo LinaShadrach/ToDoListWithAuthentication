@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Models;
+using ToDoList.Models.Repositories;
 using ToDoList.ViewModels;
 
 
@@ -12,20 +13,17 @@ namespace ToDoList.Controllers
 {
     public class AccountController : Controller
     {
-        private IAppUserRepository repo;
-        private readonly ToDoListDbContext _db;
+        private IAppUserRepository _repo;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ToDoListDbContext db)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
-            repo = new EFAppUserRepository(userManager, signInManager, db)
-            _signInManager = signInManager;
-            _db = db;
+            _repo = new EFAppUserRepository(userManager, signInManager);
         }
 
-        public AccountController(IAppUserRepository repo = null) {
-          _repo = repo;
+        public AccountController(IAppUserRepository repo) {
+            _repo = repo;
         }
 
         public UserManager<AppUser> GetUser()
@@ -46,16 +44,14 @@ namespace ToDoList.Controllers
         [HttpPost]
         public async Task<IActionResult> RegisterUser(RegisterViewModel model)
         {
-            AppUser user = new AppUser { UserName = model.Email, Email = model.Email };
-            IdentityResult result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
+            bool result = await _repo.Register(model);
+            if (result)
             {
-                await _userManager.AddToRoleAsync(user, "user");
-                return await LoginOnRegister(user, model.Password);
+                return View("Index");
             }
             else
             {
-                return View("Index", "Account");
+                return View("Register", "Account");
             }
         }
 
