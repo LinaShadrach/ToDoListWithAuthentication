@@ -12,18 +12,21 @@ namespace ToDoList.Controllers
 {
     public class AccountController : Controller
     {
+        private IAppUserRepository repo;
         private readonly ToDoListDbContext _db;
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
 
         public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ToDoListDbContext db)
         {
-            _userManager = userManager;
+            repo = new EFAppUserRepository(userManager, signInManager, db)
             _signInManager = signInManager;
             _db = db;
         }
 
-        //public AccountController() { }
+        public AccountController(IAppUserRepository repo = null) {
+          _repo = repo;
+        }
 
         public UserManager<AppUser> GetUser()
         {
